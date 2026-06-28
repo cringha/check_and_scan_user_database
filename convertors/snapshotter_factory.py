@@ -1,5 +1,6 @@
 from convertors.common_inf import SnapShoter
 from convertors.snapshotter_degress import DegreeSnapShotter, GraduationCertificateSnapShotter, XuexinwangSnapShotter
+from convertors.snapshotter_ruankao import RuanKaoCertSnapShotter
 from convertors.snapshotter_user_base_certs import  CISPSnapShotter, PMPSnapShotter, CISAWSnapShotter
 from convertors.snapshotter_user_contract import ContractSnapShotter
 from convertors.snapshotter_user_id_card import IdCardSnapShotter
@@ -16,6 +17,7 @@ SNAPSHOT_FACTORY = {
     "cisp": CISPSnapShotter,
     "pmp" : PMPSnapShotter,
     "cisaw" : CISAWSnapShotter,
+    "ruankao" : RuanKaoCertSnapShotter,
 
 }
 

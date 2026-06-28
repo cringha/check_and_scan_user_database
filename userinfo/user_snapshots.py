@@ -64,7 +64,7 @@ def read_user_snapshots(snapshot_base_path: Path, user_name: str, snapshot_types
     # all_files = [f for f in target_path.iterdir() if f.is_file()]
 
     if not files:
-        print(f"未找到 {user_name} 的社保文件, in {snapshot_base_path}, pattern: {pattern}, types: {snapshot_types}")
+        print(f"未找到 {user_name} 的证书等文件, in {snapshot_base_path}, pattern: {pattern}, types: {snapshot_types}")
         return []
 
     all_snapshot = []

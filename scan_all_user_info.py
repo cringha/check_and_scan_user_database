@@ -19,8 +19,8 @@ MATCH_RULES = {
         "学历验证",
         "电子注册备案表"
     ],
-    "graduationCertificate": ["毕业证", "毕业证书"],
-    "degreeCertificate": ["学位证", "学位证书"],
+    "graduationCertificate": ["毕业证", "毕业证书","学历"],
+    "degreeCertificate": ["学位证", "学位证书","学位"],
     "contract": [
         "劳动合同",
         "脱敏",

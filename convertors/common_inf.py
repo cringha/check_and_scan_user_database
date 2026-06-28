@@ -3,6 +3,9 @@ from typing import Dict
 from typing import List, Any, Set
 
 
+IMAGE_TYPE = ".jpg"
+
+
 class SnapShoter:
     def __init__(self, database_user_path: Path, target_user_image_path: Path):
         self.database_user_path = database_user_path

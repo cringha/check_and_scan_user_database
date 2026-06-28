@@ -1,12 +1,15 @@
 from pathlib import Path
 from typing import List
 
-from convertors.common_inf import SnapShoter
+from convertors.common_inf import SnapShoter, IMAGE_TYPE
 from tools.pdf_utils import snap_pdf_page
+from userinfo.common import SNAPSHOT_NAME_CERTS
 
 SNAP_SHOT_NAME_CISP = "cisp"
 SNAP_SHOT_NAME_CISAW = "cisaw"
 SNAP_SHOT_NAME_PMP = "pmp"
+
+
 
 class BaseCertSnapShotter(SnapShoter):
     def __init__(self, database_user_path: Path, target_user_image_path: Path):
@@ -23,7 +26,7 @@ class BaseCertSnapShotter(SnapShoter):
         id_card_file_full_name = self.database_user_path / src_file_name
         cert_type = self.get_cert_type()
         def gen_id_card_file_name(user_name1: str, page_num, page_count, pdf_filename):
-            image_name = f"{user_name1}-资质证书-{cert_type}-{page_num}.png"
+            image_name = f"{user_name1}-{SNAPSHOT_NAME_CERTS}-{cert_type}-{page_num}{IMAGE_TYPE}"
             image_full_name = self.target_user_image_path / image_name
             return str(image_full_name)
 

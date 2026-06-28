@@ -14,6 +14,7 @@ from docxtpl import DocxTemplate, InlineImage
 
 from tools.excel_utils import read_excel_sheet_values
 from userinfo.common import SNAPSHOT_PARAMS, SNAPSHOT_NAME_CERTS, SNAPSHOT_NAME_SS, ALL_SNAPSHOT_TYPE
+from userinfo.resume_manager import make_resume_factory
 from userinfo.user_resume import UserResumeReader
 from userinfo.user_resume_beijing_liantong_v1 import BeijingLianTongUserResumeReader
 from userinfo.user_snapshots import read_user_snapshots, UserSnapshot, read_user_ss_snapshots
@@ -43,7 +44,6 @@ def main(args):
 
 
 
-    snapshot_types = ["身份证", "毕业证", SNAPSHOT_NAME_CERTS, "合同", SNAPSHOT_NAME_SS]
 
     if args.input_xlsx is None or args.input_xlsx == "":
         print("--input-xlsx 空")
@@ -84,8 +84,8 @@ def main(args):
                 return False
 
     users = read_excel_sheet_values(file_name=args.input_xlsx, sheet_name=args.sheet_name_user)
-
-    user_resume = BeijingLianTongUserResumeReader(users, args)
+     #user-resume-type
+    user_resume = make_resume_factory(args.user_resume_type,users, args)
     user_resume.read_user_database(args.input_xlsx)
 
     # 加载模板文件，使用 DocxTemplate 类将模板文件转换为 docx 文档对象
@@ -102,7 +102,7 @@ def main(args):
             all_user_snapshots = read_user_snapshots(user_snapshot_root_path, user_name, snapshot_types)
 
             if SNAPSHOT_NAME_SS in snapshot_types:
-                us = read_user_ss_snapshots(user_ss_snapshot_root_path, user_name, "*.png", SNAPSHOT_NAME_SS)
+                us = read_user_ss_snapshots(user_ss_snapshot_root_path, user_name, "*.*", SNAPSHOT_NAME_SS)
                 if us is not None:
                     all_user_snapshots.append(us)
 
@@ -147,6 +147,7 @@ if __name__ == "__main__":
     parser.add_argument( "--user-snapshot-types", help="输入用户截图类型, '身份证', '毕业证', '资质证书', '合同', '社保' ",default="")
     parser.add_argument("-s", "--user-snapshot-root", help="输入用户截图文件根目录")
     parser.add_argument("-x", "--user-ss-snapshot-root", help="输入用户社保截图文件根目录")
+    parser.add_argument("-r", "--user-resume-type", help="是否需要用户简历, [v1]", default="")
     parser.add_argument("--sheet-name-user", help="User sheet name", default="Users")
     parser.add_argument("--sheet-name-project", help="project sheet name", default="Projects")
     parser.add_argument("--sheet-name-duty", help="duty sheet name", default="Duty")

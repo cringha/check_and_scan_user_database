@@ -74,7 +74,9 @@ def get_user_list_from_xlsx(excel_file_name, user_sheet_name="Users",
     user_list = []
     for user in users:
         user_name = user[col_user_name]
-        user_list.append(user_name)
+        if user_name is not None and len(user_name) > 0:
+            user_list.append(user_name)
+
     return user_list
 
 
@@ -88,7 +90,7 @@ def main(args):
         print("--user-database 空")
         return False
 
-    flags = {"idcard","contract","degree","grad","xuexinwang","cisp","cisaw","pmp"}
+    flags = {"idcard","contract","degree","grad","xuexinwang","cisp","cisaw","pmp","ruankao"}
 
     user_list = get_user_list_from_xlsx(args.input_xlsx,
                                         args.sheet_name_user,

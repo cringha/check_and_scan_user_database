@@ -6,13 +6,28 @@ import pymupdf
 
 BORDER_WIDTH = 4
 
+# from fitz import open as open_pdf
+#
+# # 打开PDF文件
+# doc = open_pdf("example.pdf")
+#
+# # 选择页面
+# page = doc.load_page(0)  # 例如，选择第一页
+#
+# # 定义截图区域，例如只截取页面的上半部分
+# rect = fitz.Rect(0, 0, page.rect.width, page.rect.height // 2)
+# pix = page.get_pixmap(matrix=fitz.Matrix(2, 2), alpha=False, colorspace=fitz.csGRAY)  # 降低分辨率
+# pix = page.get_pixmap(clip=rect)  # 只截取上半部分
+# pix.save("output_small.png")  # 保存图片
 
 def snapshot(doc, page_num, filename, user_name, pdf_filename):
     # 2. 截取首页（第一个包含目标人员的页面）
     first_page = doc[page_num]
     # 将页面转为图片（分辨率300dpi，保证清晰度）
-    mat = pymupdf.Matrix(300 / 72, 300 / 72)
-    first_pix = first_page.get_pixmap(matrix=mat)
+    # mat = pymupdf.Matrix(300 / 72, 300 / 72)
+    # mat = pymupdf.Matrix(2, 2)
+    mat = pymupdf.Matrix(1.2, 1.2)
+    first_pix = first_page.get_pixmap(matrix=mat,alpha=False)
     first_pix.save(filename)
     print(f"已保存：{user_name}, {filename}, {pdf_filename}")
 

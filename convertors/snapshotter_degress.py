@@ -1,10 +1,10 @@
 from pathlib import Path
 from typing import List
 
-from convertors.common_inf import SnapShoter
+from convertors.common_inf import SnapShoter, IMAGE_TYPE
 from tools.pdf_utils import snap_pdf_page
 
-ID_CARD = "idcard"
+
 
 
 def split_file_name(file_name_path: Path) -> str:
@@ -40,7 +40,7 @@ class BaseDegreeSnapShotter(SnapShoter):
             short_name = split_file_name(file_full_name_path)
 
             def gen_degree_file_name(user_name1: str, page_num, page_count, pdf_filename):
-                image_name = f"{user_name1}-毕业证-{order}-{short_name}-{page_num}.png"
+                image_name = f"{user_name1}-毕业证-{order}-{short_name}-{page_num}{IMAGE_TYPE}"
                 image_full_name = self.target_user_image_path / image_name
                 return str(image_full_name)
 

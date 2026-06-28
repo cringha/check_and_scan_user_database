@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import List
 
-from convertors.common_inf import SnapShoter
+from convertors.common_inf import SnapShoter, IMAGE_TYPE
 from tools.pdf_utils import snap_pdf_page
 
 KEY_CONTRACT = "contract"
@@ -23,7 +23,7 @@ class ContractSnapShotter(SnapShoter):
 
         def gen_id_card_file_name(user_name1: str, page_num, page_count, pdf_filename):
             if page_num in [0,2,8]:
-                image_name = f"{user_name1}-合同-{page_num}.png"
+                image_name = f"{user_name1}-合同-{page_num}{IMAGE_TYPE}"
                 image_full_name = self.target_user_image_path / image_name
                 return str(image_full_name)
             return None

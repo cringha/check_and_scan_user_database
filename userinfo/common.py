@@ -3,6 +3,7 @@
 
 SNAPSHOT_NAME_SS = "社保"
 SNAPSHOT_NAME_CERTS = "资质证书"
+SNAPSHOT_NAME_RUANKAO = "软考"
 
 SNAPSHOT_PARAMS = {
     "身份证": 120,
