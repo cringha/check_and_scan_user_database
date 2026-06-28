@@ -148,13 +148,13 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--user-snapshot-root", help="输入用户截图文件根目录")
     parser.add_argument("-x", "--user-ss-snapshot-root", help="输入用户社保截图文件根目录")
     parser.add_argument("-r", "--user-resume-type", help="是否需要用户简历, [v1]", default="")
-    parser.add_argument("--sheet-name-user", help="User sheet name", default="Users")
-    parser.add_argument("--sheet-name-project", help="project sheet name", default="Projects")
-    parser.add_argument("--sheet-name-duty", help="duty sheet name", default="Duty")
-    parser.add_argument("--col-user-name", help="user column name", default="Name")
-    parser.add_argument("-t", "--docx-template-file", help="docx template filename",
+    parser.add_argument("--sheet-name-user", help="User sheet name; default: %(default)s", default="Users")
+    parser.add_argument("--sheet-name-project", help="project sheet name; default: %(default)s", default="Projects")
+    parser.add_argument("--sheet-name-duty", help="duty sheet name;default: %(default)s", default="Duty")
+    parser.add_argument("--col-user-name", help="user column name;default: %(default)s", default="Name")
+    parser.add_argument("-t", "--docx-template-file", help="docx template filename; default: %(default)s",
                         default="./data/user_certs_template.docx")
-    parser.add_argument("-o", "--output-docx-file", help="输出docx文件", default="./user-ss-snapshot.docx")
+    parser.add_argument("-o", "--output-docx-file", help="输出docx文件; default: %(default)s", default="./user-ss-snapshot.docx")
     # parser.add_argument("-h", "--help", help="打印参数信息")
 
     args = parser.parse_args()

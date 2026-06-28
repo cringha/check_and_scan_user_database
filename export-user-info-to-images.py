@@ -79,6 +79,7 @@ def get_user_list_from_xlsx(excel_file_name, user_sheet_name="Users",
 
     return user_list
 
+SUPPORT_FLAGS = {"idcard","contract","degree","grad","xuexinwang","cisp","cisaw","pmp","ruankao"}
 
 def main(args):
     if args.input_xlsx is None or args.input_xlsx == "":
@@ -90,8 +91,16 @@ def main(args):
         print("--user-database 空")
         return False
 
-    flags = {"idcard","contract","degree","grad","xuexinwang","cisp","cisaw","pmp","ruankao"}
+    snapshot_types = []
+    if args.cert_type != "":
+        snapshot_types = args.cert_type.split(',')
+        for tt in snapshot_types:
+            if tt not in SUPPORT_FLAGS:
+                print(f"-t, --cert-type value , wanted , {SUPPORT_FLAGS} ")
+                return False
 
+    # flags = {"idcard","contract","degree","grad","xuexinwang","cisp","cisaw","pmp","ruankao"}
+    flags = set(snapshot_types)
     user_list = get_user_list_from_xlsx(args.input_xlsx,
                                         args.sheet_name_user,
                                         args.col_user_name
@@ -112,14 +121,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="转换用户身份证、证书、合同等转用户截图工具")
     parser.add_argument("-i", "--input-xlsx", help="输入Xlsx文件")
     parser.add_argument("-d", "--user-database", help="输入用户文件根目录")
-    parser.add_argument("-s", "--output-user-images", help="输出截图文件根目录", default="./output")
-    parser.add_argument("--sheet-name-user", help="User sheet name", default="Users")
-    parser.add_argument("--col-user-name", help="user column name", default="Name")
-    parser.add_argument("-c", "--convert", action="store_true", help="将截图转换为DOCX文档")
-    parser.add_argument("-t", "--docx-template-file", help="docx template filename",
-                        default="./data/user_ss_template.docx")
-    parser.add_argument("-o", "--output-docx-file", help="输出docx文件", default="./user-ss-snapshot.docx")
-    # parser.add_argument("-h", "--help", help="打印参数信息")
+    parser.add_argument("-s", "--output-user-images", help="输出截图文件根目录; default: %(default)s", default="./output")
+    parser.add_argument("-t", "--cert-type", help="要转换的类型; default: %(default)s",
+                        default="idcard,contract,degree,grad,xuexinwang,cisp,cisaw,pmp,ruankao")
+    parser.add_argument("--sheet-name-user", help="User sheet name; default: %(default)s", default="Users")
+    parser.add_argument("--col-user-name", help="user column name; default: %(default)s", default="Name")
+
 
     args = parser.parse_args()
 
