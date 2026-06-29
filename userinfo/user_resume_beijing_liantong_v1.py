@@ -1,4 +1,6 @@
+import os
 import random
+import sys
 
 from tools.excel_utils import read_excel_sheet_values
 from tools.utils import get_dict_val
@@ -33,12 +35,17 @@ class YearProjects:
 def build_projects(projects):
     project_cache = {}
     for pro in projects:
-        year = pro["Year"]
-        name = pro["Name"]
-        summary = pro["Summary"]
-        end = pro["End"]
-        begin = pro["Begin"]
-        scope = pro["Scope"]
+        year = get_dict_val(pro,"Year")
+        name = get_dict_val(pro, "Name")
+        summary = get_dict_val(pro,"Summary")
+        end = get_dict_val(pro, "End")
+        begin = get_dict_val(pro, "Begin")
+        scope = get_dict_val(pro, "Scope")
+
+        if year is None or name is None or summary is None or end is None or begin is None or scope is None:
+            print("user.xlsx 文件中， Project sheet 格式不对，应该有 Year, Name, Summary, Begin, End, Scope 字段")
+            sys.exit(-1)
+
 
         p = Project(year, name,summary, begin,end, scope)
         if year not in project_cache:

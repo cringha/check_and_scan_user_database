@@ -7,16 +7,11 @@ from pathlib import Path
 import argparse
 from docx.shared import Mm
 from jinja2 import Environment
-import pandas as pd
-
-import json
 from docxtpl import DocxTemplate, InlineImage
 
 from tools.excel_utils import read_excel_sheet_values
 from userinfo.common import SNAPSHOT_PARAMS, SNAPSHOT_NAME_CERTS, SNAPSHOT_NAME_SS, ALL_SNAPSHOT_TYPE
 from userinfo.resume_manager import make_resume_factory
-from userinfo.user_resume import UserResumeReader
-from userinfo.user_resume_beijing_liantong_v1 import BeijingLianTongUserResumeReader
 from userinfo.user_snapshots import read_user_snapshots, UserSnapshot, read_user_ss_snapshots
 
 image_size = 120
@@ -102,6 +97,7 @@ def main(args):
             all_user_snapshots = read_user_snapshots(user_snapshot_root_path, user_name, snapshot_types)
 
             if SNAPSHOT_NAME_SS in snapshot_types:
+                # 读取社保的截图
                 us = read_user_ss_snapshots(user_ss_snapshot_root_path, user_name, "*.*", SNAPSHOT_NAME_SS)
                 if us is not None:
                     all_user_snapshots.append(us)

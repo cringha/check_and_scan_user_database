@@ -4,15 +4,14 @@ from typing import List, Dict
 from userinfo.common import SNAPSHOT_NAME_SS, SNAPSHOT_NAME_CERTS
 
 
-
 class InlineImagePackage:
-    def __init__(self , title :str, image ) -> None:
+    def __init__(self, title: str, image) -> None:
         self.title = title
         self.image = image
 
 
 class SnapshotImage:
-    def __init__(self, title :str , image_path: Path):
+    def __init__(self, title: str, image_path: Path):
         self.title = title
         self.image_path = image_path
 
@@ -23,13 +22,13 @@ class SnapshotImage:
 class UserSnapshot:
     def __init__(self, title: str):
         self.title = title
-        self.snapshot : List[SnapshotImage] = []
-        self.images : List[InlineImagePackage] = []
+        self.snapshot: List[SnapshotImage] = []
+        self.images: List[InlineImagePackage] = []
 
-    def add_snapshot(self, sub_title:str , snapshot:Path ):
+    def add_snapshot(self, sub_title: str, snapshot: Path):
         self.snapshot.append(SnapshotImage(sub_title, snapshot))
 
-    def add_image(self, sub_title:str, image):
+    def add_image(self, sub_title: str, image):
         self.images.append(InlineImagePackage(sub_title, image))
 
     def __str__(self):
@@ -86,30 +85,49 @@ def read_user_snapshots(snapshot_base_path: Path, user_name: str, snapshot_types
                     sub_type = extra_sub_type_from_file_name(file)
                 else:
                     sub_type = ""
-                us.add_snapshot( sub_type, file  )
+                us.add_snapshot(sub_type, file)
             all_snapshot.append(us)
 
     return all_snapshot
 
-def extra_sub_type_from_file_name( file:Path ) -> str:
+
+def extra_sub_type_from_file_name(file: Path) -> str:
     file_name = file.stem
-    if '-' in file_name :
-        parts  = file_name.split('-')
-        if len(parts) >= 3 :
-            return parts[2] # 文件名 林阳-资质证书-CISP-0.png
+    if '-' in file_name:
+        parts = file_name.split('-')
+        if len(parts) >= 3:
+            return parts[2]  # 文件名 林阳-资质证书-CISP-0.png
 
     return ""
 
-def read_user_ss_snapshots(ss_snapshot_base_path: Path, user_name: str, pattern="*",
-                           ss_snapshot_type_name=SNAPSHOT_NAME_SS) ->    None | UserSnapshot:
+
+def find_user_path_in_ss_root(ss_snapshot_base_path: Path, user_name: str, pattern="*"):
     user_ss_snapshot_base_path = ss_snapshot_base_path / user_name
 
     # 获取所有匹配的文件（排除子目录）
     files = [f for f in user_ss_snapshot_base_path.glob(pattern)]
-    # all_files = [f for f in target_path.iterdir() if f.is_file()]
-
     if not files:
         print(f"未找到 {user_name} 的社保文件, in {ss_snapshot_base_path}, pattern: {pattern}")
+
+        return None
+    return files
+
+
+def read_user_ss_snapshots(ss_snapshot_base_path: Path, user_name: str, pattern="*",
+                           ss_snapshot_type_name=SNAPSHOT_NAME_SS) -> None | UserSnapshot:
+
+    files = find_user_path_in_ss_root( ss_snapshot_base_path, user_name, pattern)
+    if not files:
+        # 把文件名去除 数字后，再找一遍
+        user_name1 = user_name.rstrip("0123456789")
+        if user_name1 == user_name:
+            return None
+        files = find_user_path_in_ss_root(ss_snapshot_base_path, user_name1, pattern)
+        # user_ss_snapshot_base_path = ss_snapshot_base_path / user_name
+        if files :
+            print(f"找到了 {user_name1} 的社保文件, in {ss_snapshot_base_path}, pattern: {pattern}")
+
+    if not files:
         return None
 
     snapshot_file_list = []
@@ -119,11 +137,9 @@ def read_user_ss_snapshots(ss_snapshot_base_path: Path, user_name: str, pattern=
 
     if len(snapshot_file_list) > 0:
         snapshot_file_list = sorted(snapshot_file_list, key=lambda f: f.name)
-        us = UserSnapshot(ss_snapshot_type_name )
+        us = UserSnapshot(ss_snapshot_type_name)
         for file in snapshot_file_list:
-
-
-            us.add_snapshot( "" , file)
+            us.add_snapshot("", file)
         return us
 
     return None
