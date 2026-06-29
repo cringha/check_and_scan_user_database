@@ -93,6 +93,7 @@ def file_size(file_path):
 
 
 def get_dict_val(obj, name, default_value=None):
+
     if name in obj:
         return obj[name]
     return default_value

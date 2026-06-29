@@ -5,7 +5,7 @@ class UserResumeReader:
         self.user_list = user_list
         self.args = args
 
-    def read_user_database(self , input_xlsx :str  ) :
+    def read_user_database(self , input_xlsx :str  ) -> bool :
         pass
 
 

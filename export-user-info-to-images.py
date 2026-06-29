@@ -130,6 +130,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    result = main(args)
-    if not result:
-        parser.print_help()
+
+    try:
+        result = main(args)
+        if not result:
+            parser.print_help()
+    except Exception as e:
+        print("Exec main error ", e )

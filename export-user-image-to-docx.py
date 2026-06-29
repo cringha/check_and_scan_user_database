@@ -17,8 +17,6 @@ from userinfo.user_snapshots import read_user_snapshots, UserSnapshot, read_user
 image_size = 120
 
 
-
-
 def process_user_snapshot(tpl, user_snapshot_root_path: Path, us: UserSnapshot):
     for ss in us.snapshot:
 
@@ -36,10 +34,6 @@ def process_user_snapshot(tpl, user_snapshot_root_path: Path, us: UserSnapshot):
 
 
 def main(args):
-
-
-
-
     if args.input_xlsx is None or args.input_xlsx == "":
         print("--input-xlsx 空")
         return False
@@ -55,7 +49,7 @@ def main(args):
     user_snapshot_root_path = None
     user_ss_snapshot_root_path = None
 
-    if len(snapshot_types)>0:
+    if len(snapshot_types) > 0:
         if args.user_snapshot_root is None or args.user_snapshot_root == "":
             print("--user-snapshot-root 空")
             return False
@@ -79,8 +73,8 @@ def main(args):
                 return False
 
     users = read_excel_sheet_values(file_name=args.input_xlsx, sheet_name=args.sheet_name_user)
-     #user-resume-type
-    user_resume = make_resume_factory(args.user_resume_type,users, args)
+    # user-resume-type
+    user_resume = make_resume_factory(args.user_resume_type, users, args)
     user_resume.read_user_database(args.input_xlsx)
 
     # 加载模板文件，使用 DocxTemplate 类将模板文件转换为 docx 文档对象
@@ -127,7 +121,6 @@ def main(args):
 
     user_resume.hook_jinja(jinja_env)
 
-
     docx.render(obj, jinja_env)
     # 保存生成的文档
     print(f"生成文件 : {output_file1} ")
@@ -140,7 +133,8 @@ if __name__ == "__main__":
     #
     parser = argparse.ArgumentParser(description="将用户身份证、证书、合同截图转换为DOCX文档")
     parser.add_argument("-i", "--input-xlsx", help="输入Xlsx文件")
-    parser.add_argument( "--user-snapshot-types", help="输入用户截图类型, '身份证', '毕业证', '资质证书', '合同', '社保' ",default="")
+    parser.add_argument("--user-snapshot-types",
+                        help="输入用户截图类型, '身份证', '毕业证', '资质证书', '合同', '社保' ", default="")
     parser.add_argument("-s", "--user-snapshot-root", help="输入用户截图文件根目录")
     parser.add_argument("-x", "--user-ss-snapshot-root", help="输入用户社保截图文件根目录")
     parser.add_argument("-r", "--user-resume-type", help="是否需要用户简历, [v1]", default="")
@@ -148,13 +142,23 @@ if __name__ == "__main__":
     parser.add_argument("--sheet-name-project", help="project sheet name; default: %(default)s", default="Projects")
     parser.add_argument("--sheet-name-duty", help="duty sheet name;default: %(default)s", default="Duty")
     parser.add_argument("--col-user-name", help="user column name;default: %(default)s", default="Name")
+
+    parser.add_argument("--col-work-exp", help="column workExp name in user sheet;default: %(default)s", default="工作年限")
+    parser.add_argument("--col-duty", help="column duty name in user sheet;default: %(default)s", default="职责")
+    parser.add_argument("--col-duty-desc", help="column duty-desc name in user sheet;default: %(default)s", default="职责内容")
+
+
     parser.add_argument("-t", "--docx-template-file", help="docx template filename; default: %(default)s",
                         default="./data/user_certs_template.docx")
-    parser.add_argument("-o", "--output-docx-file", help="输出docx文件; default: %(default)s", default="./user-ss-snapshot.docx")
+    parser.add_argument("-o", "--output-docx-file", help="输出docx文件; default: %(default)s",
+                        default="./user-ss-snapshot.docx")
     # parser.add_argument("-h", "--help", help="打印参数信息")
 
     args = parser.parse_args()
 
-    result = main(args)
-    if not result:
-        parser.print_help()
+    try:
+        result = main(args)
+        if not result:
+            parser.print_help()
+    except Exception as e:
+        print("Exec main error ", e)
