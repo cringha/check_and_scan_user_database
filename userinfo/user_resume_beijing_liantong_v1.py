@@ -4,6 +4,7 @@ import sys
 
 from tools.excel_utils import read_excel_sheet_values
 from tools.utils import get_dict_val
+from userinfo.common import SNAPSHOT_NAME_CERTS
 from userinfo.dutyinfo import convert_duty_2_dict, find_user_duty_info
 from userinfo.user_resume import UserResumeReader
 from jinja2 import Environment
@@ -106,15 +107,21 @@ def user_project_exp(user, project):
     username = get_dict_val(user, "Name")
     projectname = get_dict_val(project, "Name", "<PROJECT_NAME>")
 
-    print("user name ", username, " project ", projectname)
+    # print("user name ", username, " project ", projectname)
 
     begin = get_dict_val(project, 'Begin', 1)
     end = get_dict_val(project, 'End', 2)
 
-    print("begin  ", begin, " ", type(begin), " end  ", end, " ", type(end))
+    # print("begin  ", begin, " ", type(begin), " end  ", end, " ", type(end))
 
     return int((end - begin + 1) * 12)
 
+
+KEY_SNAPSHOTS = "snapshots"
+KEY_CERT_LIST = "CERT_LIST"
+KEY_DUTY = "DUTY"
+KEY_DUTY_DESC = "DUTY_DESC"
+KEY_WORK_EXP = "WORK_EXP"
 
 class BeijingLianTongUserResumeReader(UserResumeReader):
 
@@ -127,8 +134,21 @@ class BeijingLianTongUserResumeReader(UserResumeReader):
         self.col_work_exp = args.col_work_exp # 工作年限
         self.col_duty = args.col_duty # 职责
         self.col_duty_desc = args.col_duty_desc # 职责内容
+        self.col_user_cert_list = args.col_user_cert_list
         self.project_cache = None
         self.duties_info = None
+
+        if self.col_duty is None or self.col_duty =="":
+            self.col_duty = KEY_DUTY
+
+        if self.col_duty_desc is None or self.col_duty_desc == "":
+            self.col_duty_desc = KEY_DUTY_DESC
+
+        if self.col_user_cert_list is None or self.col_user_cert_list =="":
+            self.col_user_cert_list = KEY_CERT_LIST
+
+        if self.col_work_exp is None or self.col_work_exp =="":
+            self.col_work_exp = KEY_WORK_EXP
 
     def hook_jinja(self, jinja_env: Environment):
         jinja_env.globals['user_project_exp'] = user_project_exp
@@ -165,3 +185,17 @@ class BeijingLianTongUserResumeReader(UserResumeReader):
         if self.duties_info is not None:
             duty = get_dict_val(user, self.col_duty)
             user[self.col_duty_desc] = find_user_duty_info(self.duties_info, duty)
+
+
+        if KEY_SNAPSHOTS in user:
+            snapshots = user[KEY_SNAPSHOTS]
+            if snapshots is not None and len(snapshots) > 0:
+                for us in snapshots: # UserSnapshot
+                    if us.title == SNAPSHOT_NAME_CERTS:
+                        cert_list=[]
+                        for ss in us.snapshot: # SnapshotImage
+                            if ss.title is not None and ss.title !="":
+                                cert_list.append(ss.title)
+
+                        user[self.col_user_cert_list] = ",".join(cert_list)
+

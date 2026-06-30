@@ -146,6 +146,8 @@ if __name__ == "__main__":
     parser.add_argument("--col-work-exp", help="column workExp name in user sheet;default: %(default)s", default="工作年限")
     parser.add_argument("--col-duty", help="column duty name in user sheet;default: %(default)s", default="职责")
     parser.add_argument("--col-duty-desc", help="column duty-desc name in user sheet;default: %(default)s", default="职责内容")
+    parser.add_argument("--col-user-cert-list", help="column user-cert-list name in user sheet;default: %(default)s", default="证书列表")
+
 
 
     parser.add_argument("-t", "--docx-template-file", help="docx template filename; default: %(default)s",
