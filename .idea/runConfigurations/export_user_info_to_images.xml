@@ -14,7 +14,7 @@
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <option name="RUN_TOOL" value="" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/export-user-info-to-images.py" />
-    <option name="PARAMETERS" value="-i user-list.xlsx  --sheet-name-user Users --col-user-name 人名  -d D:\用户身份证、毕业证、合同等信息" />
+    <option name="PARAMETERS" value="-i inputs\users-full-list.xlsx --sheet-name-user 人员 --col-user-name 姓名 -d D:\用户身份证、毕业证、合同等信息" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

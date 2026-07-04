@@ -37,7 +37,7 @@ def build_projects(projects):
     for pro in projects:
         if pro is None:
             continue
-        
+
         year = get_dict_val(pro, "Year")
         name = get_dict_val(pro, "Name")
         summary = get_dict_val(pro, "Summary")

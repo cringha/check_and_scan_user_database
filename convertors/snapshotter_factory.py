@@ -8,6 +8,8 @@ from pathlib import Path
 from typing import Dict
 from typing import List, Any, Set
 
+from uitls.log import get_log
+
 SNAPSHOT_FACTORY = {
     "idcard": IdCardSnapShotter,
     "contract": ContractSnapShotter,
@@ -27,11 +29,13 @@ class SnapshotManager:
         self.snapshots = {}
         self.database_user_path = database_user_path
         self.target_user_image_path = target_user_image_path
+        self.logger = get_log()
 
     def get_snapshot(self, flag: str) -> SnapShoter | None:
         if flag not in self.snapshots:
             if flag not in SNAPSHOT_FACTORY:
-                print(f"Flag not support,  {flag}, ", SNAPSHOT_FACTORY.keys())
+                self.logger.error(f"Flag {flag} not support. { SNAPSHOT_FACTORY.keys()} ")
+                # print(f"Flag not support,  {flag}, ", SNAPSHOT_FACTORY.keys())
                 return None
 
             snapshot = SNAPSHOT_FACTORY[flag](self.database_user_path, self.target_user_image_path)
@@ -47,7 +51,7 @@ class SnapshotManager:
 
             info_key = snapshot.get_info_key()
             if info_key not in user_info:
-                print(f"User {user_name} info.json, not info {info_key}, for flag {flag}")
+                self.logger.warning (f"User {user_name} info.json, not info {info_key}, for flag {flag}")
                 continue
 
             files = user_info[info_key]

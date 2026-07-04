@@ -1,39 +1,46 @@
+import random
 import re
 import shutil
-import sys
+import string
 import tempfile
 import time
 import os
 import tarfile
 
 import json
-import datetime
+from datetime import datetime
 import os
 from pathlib import Path
 
 
+# import yaml
+
+
+def is_array(arr):
+    return isinstance(arr, list) or isinstance(arr, tuple)
+
 
 # 将 yyyyMMddHHmmss 格式的字符串转换为 时间类型
-def to_datetime(s):
-    if s is None:
+def to_datetime(s: str) -> datetime:
+    if is_blank(s):
         return None
     ln = len(s)
     if ln == 14:
-        tm = datetime.datetime.strptime(s, '%Y%m%d%H%M%S')
+        tm = datetime.strptime(s, '%Y%m%d%H%M%S')
     elif ln == 12:
-        tm = datetime.datetime.strptime(s, '%Y%m%d%H%M')  # yyyyMMddHHmm
+        tm = datetime.strptime(s, '%Y%m%d%H%M')  # yyyyMMddHHmm
     elif ln == 10:
-        tm = datetime.datetime.strptime(s, '%Y%m%d%H')  # yyyyMMddhh
+        tm = datetime.strptime(s, '%Y%m%d%H')  # yyyyMMddhh
     elif ln == 8:
-        tm = datetime.datetime.strptime(s, '%Y%m%d')  # yyyyMMdd
+        tm = datetime.strptime(s, '%Y%m%d')  # yyyyMMdd
     else:
-        raise Exception('Unknonw time {}'.format(s))
+        raise Exception('Unknown time {}'.format(s))
 
     return tm
 
 
 def get_timestamp():
-    nw = datetime.datetime.now()
+    nw = datetime.now()
     return nw.strftime('%Y_%m_%d_%H_%M_%S')
 
 
@@ -92,12 +99,13 @@ def file_size(file_path):
         return convert_bytes(file_info.st_size)
 
 
-def get_dict_val(obj, name, default_value=None):
-
-    if name in obj:
-        return obj[name]
-    return default_value
-
+def get_dict_val(obj, name):
+    try:
+        if name in obj:
+            return obj[name]
+        return None
+    except Exception as e:
+        raise e
 
 def get_extension(filename):
     return Path(filename).suffix
@@ -135,24 +143,31 @@ def read_dict(obj, fullname, def_val=None):
     return one
 
 
-def to_json_str(obj):
-    s = json.dumps(obj, cls=ComplexEncoder)
-    return s
+def json_to_dict(buff):
+    return json.loads(buff)
 
 
-#
-class ComplexEncoder(json.JSONEncoder):
-    def default(self, obj):
-
-        if isinstance(obj, datetime.datetime):
-            return obj.strftime('%Y-%m-%d %H:%M:%S.%f')  # return obj.isoformat()
-        elif isinstance(obj, set):
-            return list(obj)
-        elif isinstance(obj, object):
-            return obj.__dict__
+def remove_file(filename, mute=True, throws=False):
+    try:
+        os.remove(filename)
+    except Exception as e:
+        if throws:
+            raise e
         else:
-            return super().default(obj)
-            # return obj.__dict__
+            if not mute:
+                print("remove file err ", filename, str(e));
+
+def is_empty(v):
+    if v is None or v == "":
+        return True
+    return False
+
+
+def is_not_empty(v):
+    if v is not None and v != "":
+        return True
+    return False
+
 
 
 def beans_to_arrays(beans, names):
@@ -321,7 +336,7 @@ def get_file_list(parent):
         isdir = os.path.isdir(file)
         if not isdir:
             t = os.path.getmtime(file)
-            tt = datetime.datetime.fromtimestamp(t)
+            tt = datetime.fromtimestamp(t)
             size = file_size(file)
             out.append({"name": filename, "type": "file", "size": size, "modified": tt})
     return out
@@ -390,10 +405,10 @@ def dump_dict(val, rep=0):
             print("{}{} : {}".format(prefix, name, value))
 
 
-def load_yaml_config(filename):
-    with open(filename, "r", encoding="utf-8") as f:
-        data = yaml.safe_load(f)
-        return data
+# def load_yaml_config(filename):
+#     with open(filename, "r", encoding="utf-8") as f:
+#         data = yaml.safe_load(f)
+#         return data
 
 
 def compress_folder(folder_path, output_filename):
@@ -415,3 +430,43 @@ def get_tmp_dir():
     return pathname;
 
 
+def get_user_home():
+    user_home = os.environ.get('USERPROFILE', os.environ.get('HOME'))
+    return user_home
+
+
+tables = string.ascii_letters + string.digits
+
+
+def get_rand_str(k=20) -> str:
+    res = ''.join(random.choices(tables, k=k))
+    return res
+
+
+import shutil
+import os
+
+
+def clear_directory(directory):
+    for filename in os.listdir(directory):
+        file_path = os.path.join(directory, filename)
+        try:
+            if os.path.isfile(file_path):
+                os.unlink(file_path)  # 删除文件
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)  # 删除非空目录（慎用，会递归删除）
+        except Exception as e:
+            print(f'Failed to delete {file_path}. Reason: {e}')
+
+
+def save_to_json(output_file: str, obj):
+    dest_file = Path(output_file)
+    file_name = dest_file.stem
+    counter = 1
+    while dest_file.exists():
+        dest_file = dest_file.parent / f"{file_name}_{counter}{dest_file.suffix}"
+        counter += 1
+
+    output_file1 = str(dest_file)
+    with open(output_file1, "w", encoding="utf-8") as f:
+        json.dump(obj, f, ensure_ascii=False, indent=2)

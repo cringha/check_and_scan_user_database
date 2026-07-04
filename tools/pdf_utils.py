@@ -4,6 +4,8 @@ import os
 
 import pymupdf
 
+from uitls.log import get_log
+
 BORDER_WIDTH = 4
 
 # from fitz import open as open_pdf
@@ -29,17 +31,21 @@ def snapshot(doc, page_num, filename, user_name, pdf_filename):
     mat = pymupdf.Matrix(1.2, 1.2)
     first_pix = first_page.get_pixmap(matrix=mat,alpha=False)
     first_pix.save(filename)
-    print(f"已保存：{user_name}, {filename}, {pdf_filename}")
+
+    logger = get_log()
+    logger.info (f"已保存：{user_name}, {filename}, {pdf_filename}")
+
+    # print(f"已保存：{user_name}, {filename}, {pdf_filename}")
 
 
 def snap_pdf_page(pdf_filename: str, user_name: str, cb_filename):
     # print("Process ", pdf_path)
-
+    logger = get_log()
     # 打开PDF文件
     # pymupdf.open
     doc = pymupdf.open(pdf_filename)
     if doc.page_count == 0:
-        print("PDF文件为空，无法处理, {pdf_path}")
+        logger.info(f"PDF文件为空，无法处理, {pdf_filename}")
         return False
 
     # 1. 遍历PDF页面，查找目标人员并添加红色框
@@ -48,6 +54,6 @@ def snap_pdf_page(pdf_filename: str, user_name: str, cb_filename):
         if file_name is not None:
             snapshot(doc, page_num, file_name, user_name, pdf_filename)
         else:
-            print(f"文件不符合策略没有保存：{user_name}, page_num: {page_num}, {pdf_filename}")
+            logger.warning (f"文件不符合策略没有保存：{user_name}, page_num: {page_num}, {pdf_filename}")
 
     return True

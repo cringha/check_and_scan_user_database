@@ -6,7 +6,7 @@ export-user-info-to-images.py
 
 ```shell
 
-usage: export-user-info-to-images.py [-h] [-i INPUT_XLSX] [-d USER_DATABASE] [-s OUTPUT_USER_IMAGES]
+usage: user_info_to_snapshots.py [-h] [-i INPUT_XLSX] [-d USER_DATABASE] [-s OUTPUT_USER_IMAGES]
                                      [--sheet-name-user SHEET_NAME_USER] [--col-user-name COL_USER_NAME] [-c]
                                      [-t DOCX_TEMPLATE_FILE] [-o OUTPUT_DOCX_FILE]
 
