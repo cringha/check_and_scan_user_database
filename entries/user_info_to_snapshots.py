@@ -62,7 +62,9 @@ def step_all_user_list(user_database_path1, output_image_dir1,
             # print(f"!!!! 没有找到对应的目录 :{user_name}   ")
 
             if cb_userinfo is not None:
-                cb_userinfo(False , user_name, f"没有找到对应的目录, {target_user_name}")
+                result =cb_userinfo(False , user_name, f"没有找到对应的目录, {target_user_name}")
+                if result:
+                    return user_list
 
             continue
 
@@ -71,7 +73,9 @@ def step_all_user_list(user_database_path1, output_image_dir1,
             # print(f"!!! database user path , {target_user_name} not exist ")
             logger.warning(f"!!! database user path , {target_user_name} not exist ")
             if cb_userinfo is not None:
-                cb_userinfo(False , user_name,f"Database user path , {target_user_name} not exist ")
+                result = cb_userinfo(False , user_name,f"Database user path , {target_user_name} not exist ")
+                if result:
+                    return user_list
 
             continue
 
@@ -82,7 +86,9 @@ def step_all_user_list(user_database_path1, output_image_dir1,
         convert_user_info_to_images(database_user_path, target_user_image_path, user_name, flags)
         logger.info(f"处理了用户：{user_name} , {target_user_image_path}")
         if cb_userinfo is not None:
-            cb_userinfo( True,  user_name , target_user_image_path )
+            result = cb_userinfo( True,  user_name , target_user_image_path )
+            if result :
+                return user_list
 
     return user_list
 

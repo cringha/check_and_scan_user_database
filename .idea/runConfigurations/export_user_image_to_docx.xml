@@ -14,7 +14,7 @@
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <option name="RUN_TOOL" value="" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/export-user-image-to-docx.py" />
-    <option name="PARAMETERS" value="-i user-list.xlsx  --sheet-name-user Users --col-user-name 人名 -s output -x ..\ss_images" />
+    <option name="PARAMETERS" value="-i inputs/user-list.xlsx --sheet-name-user Users --col-user-name 人名 -s output -x ..\ss_images" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

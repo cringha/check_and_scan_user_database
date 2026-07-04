@@ -3,7 +3,8 @@ import random
 import sys
 
 from tools.excel_utils import read_excel_sheet_values
-from tools.utils import get_dict_val
+from uitls.utils import get_dict_val
+
 from userinfo.dutyinfo import convert_duty_2_dict, find_user_duty_info
 from userinfo.user_resume import UserResumeReader
 from jinja2 import Environment

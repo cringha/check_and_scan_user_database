@@ -1,7 +1,7 @@
 import os
 import sys
 
-from tools.utils import get_dict_val
+from uitls.utils import get_dict_val
 
 
 class DutyInfo:

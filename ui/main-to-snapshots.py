@@ -1,11 +1,12 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
-
 from entries.user_info_to_snapshots import do_export_user_info_to_snapshots
-from uitls.log import init_with_conf, get_log,LogConfig
-
-
+from uitls.log import init_with_conf, get_log, LogConfig
+import threading
+import os
+import json
+CONFIG_PATH = "config.json"
 class ScreenshotConverterUI:
     def __init__(self, root):
         self.logger = get_log()
@@ -28,7 +29,37 @@ class ScreenshotConverterUI:
         self.entry_sheet = None
         self.entry_col = None
 
+        self.flag_stop = False
+
+        # 加载上次配置
+        self.config = self.load_config()
+
         self._create_widgets()
+
+    # ===================== 配置保存/加载 =====================
+    def load_config(self):
+        if os.path.exists(CONFIG_PATH):
+            try:
+                with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except:
+                pass
+        return {}
+
+    def save_config(self):
+        cfg = {
+            "input_xlsx": self.entry_xlsx.get().strip(),
+            "user_database": self.entry_user_db.get().strip(),
+            "output_user_images": self.entry_output.get().strip(),
+            "cert_type_selected": [ct for ct, var in self.cert_vars.items() if var.get()],
+            "sheet_name_user": self.entry_sheet.get().strip(),
+            "col_user_name": self.entry_col.get().strip()
+        }
+        try:
+            with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+                json.dump(cfg, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print("保存配置失败:", e)
 
     def _create_widgets(self):
         padx = 5
@@ -60,7 +91,7 @@ class ScreenshotConverterUI:
         )
         self.entry_output = ttk.Entry(self.root, width=50)
         self.entry_output.grid(row=2, column=1, padx=padx, pady=pady)
-        self.entry_output.insert(0, "./output")
+        # self.entry_output.insert(0, "./output")
         ttk.Button(self.root, text="选择", command=self._select_output).grid(
             row=2, column=2, padx=padx, pady=pady
         )
@@ -74,22 +105,35 @@ class ScreenshotConverterUI:
         cert_frame = ttk.Frame(self.root)
         cert_frame.grid(row=3, column=1, columnspan=2, padx=padx, pady=pady, sticky=tk.W)
 
-        # 生成多选框，默认全选
-        row_cb = 0
-        col_cb = 0
+        row_cb, col_cb = 0, 0
+        saved_selected = self.config.get("cert_type_selected", self.cert_types)
         for ct in self.cert_types:
-            var = tk.BooleanVar(value=True)
+            is_checked = ct in saved_selected
+            var = tk.BooleanVar(value=is_checked)
             self.cert_vars[ct] = var
-            cb = ttk.Checkbutton(
-                cert_frame,
-                text=ct,
-                variable=var
-            )
+            cb = ttk.Checkbutton(cert_frame, text=ct, variable=var)
             cb.grid(row=row_cb, column=col_cb, sticky=tk.W, padx=3, pady=2)
             col_cb += 1
             if col_cb >= 3:
                 col_cb = 0
                 row_cb += 1
+
+        # # 生成多选框，默认全选
+        # row_cb = 0
+        # col_cb = 0
+        # for ct in self.cert_types:
+        #     var = tk.BooleanVar(value=True)
+        #     self.cert_vars[ct] = var
+        #     cb = ttk.Checkbutton(
+        #         cert_frame,
+        #         text=ct,
+        #         variable=var
+        #     )
+        #     cb.grid(row=row_cb, column=col_cb, sticky=tk.W, padx=3, pady=2)
+        #     col_cb += 1
+        #     if col_cb >= 3:
+        #         col_cb = 0
+        #         row_cb += 1
 
         # 5. Sheet name
         ttk.Label(self.root, text="User Sheet 名称 (--sheet-name-user)").grid(
@@ -97,7 +141,7 @@ class ScreenshotConverterUI:
         )
         self.entry_sheet = ttk.Entry(self.root, width=50)
         self.entry_sheet.grid(row=4, column=1, padx=padx, pady=pady)
-        self.entry_sheet.insert(0, "人员")
+        # self.entry_sheet.insert(0, "人员")
 
         # 6. 用户名列
         ttk.Label(self.root, text="用户名列名称 (--col-user-name)").grid(
@@ -105,20 +149,46 @@ class ScreenshotConverterUI:
         )
         self.entry_col = ttk.Entry(self.root, width=50)
         self.entry_col.grid(row=5, column=1, padx=padx, pady=pady)
-        self.entry_col.insert(0, "姓名")
+        # self.entry_col.insert(0, "姓名")
 
-        # 执行按钮
-        ttk.Button(
-            self.root,
+
+        # 按钮框架：开始转换 + 停止 并排
+        btn_frame = ttk.Frame(self.root)
+        btn_frame.grid(row=6, column=0, columnspan=3, pady=12)
+
+        self.button_start = ttk.Button(
+            btn_frame,
             text="开始转换",
-            command=self._run_convert
-        ).grid(row=6, column=0, columnspan=3, pady=12)
+            command=self.start_task
+        )
+        self.button_start.pack(side=tk.LEFT, padx=5)
+
+        self.button_stop = ttk.Button(
+            btn_frame,
+            text="停止",
+            command=self.stop_task,
+            state=tk.DISABLED
+        )
+        self.button_stop.pack(side=tk.LEFT, padx=5)
 
         # ================== 状态栏 ==================
         self.status_bar = ttk.Label(self.root, text="就绪", relief=tk.SUNKEN, anchor=tk.W)
         self.status_bar.grid(row=7, column=0, columnspan=3, sticky=tk.EW, padx=1, pady=1)
         # 让状态栏横向拉伸
         self.root.grid_columnconfigure(1, weight=1)
+
+        # 加载上次值
+        self._restore_config()
+
+    def _restore_config(self):
+        """恢复上次参数"""
+
+        input_xlsx = self.config.get("input_xlsx", "")
+        self.entry_xlsx.insert(0, input_xlsx)
+        self.entry_user_db.insert(0, self.config.get("user_database", ""))
+        self.entry_output.insert(0, self.config.get("output_user_images", "./output"))
+        self.entry_sheet.insert(0, self.config.get("sheet_name_user", "Users"))
+        self.entry_col.insert(0, self.config.get("col_user_name", "Name"))
 
     def set_status(self, msg):
         """更新状态栏消息"""
@@ -152,6 +222,36 @@ class ScreenshotConverterUI:
         # return ",".join(selected)
         return set(selected)
 
+    def stop_task(self):
+        self.flag_stop = True
+
+    def start_task(self):
+        # 创建一个新线程来运行任务
+        thread = threading.Thread(target=self.run_convert)
+        thread.start()
+
+    def run_convert(self):
+        try:
+            self.save_config()
+            self.button_start.config(state=tk.DISABLED)
+            self.button_stop.config(state=tk.NORMAL)
+            self.flag_stop = False
+            self._run_convert()
+        except Exception as ee:
+            print(ee)
+        finally:
+            self.button_stop.config(state=tk.DISABLED)
+            self.button_start.config(state=tk.NORMAL)
+
+
+    def _cb_user_info(self, status, user_name, path_name):
+        if status:
+            self.set_status(f"User: {user_name}, path :{path_name}")
+        else:
+            self.set_status(f"User: {user_name}, path :{path_name}")
+        return False
+
+
     def _run_convert(self):
 
         input_xlsx = self.entry_xlsx.get().strip()
@@ -172,25 +272,33 @@ class ScreenshotConverterUI:
             return
 
         try:
+            def cb_user_info(status, user_name, path_name):
 
-            def cb_user_info( status , user_name, path_name ):
+                # 如果 flag 置位，说明要终止数据处理
+                if self.flag_stop:
+                    return True
+
                 if status:
                     self.set_status(f"User: {user_name}, path :{path_name}")
                 else:
                     self.set_status(f"User: {user_name}, path :{path_name}")
-                pass
+                return False
+
 
             user_list = do_export_user_info_to_snapshots(input_xlsx,
-                                                     user_database,
-                                                     output_user_images,
-                                                     cert_type,
+                                                         user_database,
+                                                         output_user_images,
+                                                         cert_type,
                                                          cb_user_info,
-                                                     sheet_name_user,
-                                                     col_user_name)
-            self.set_status( "任务执行完成！")
+                                                         sheet_name_user,
+                                                         col_user_name)
+            if self.flag_stop:
+                self.set_status("用户执行终止")
+            else:
+                self.set_status("任务执行完成！")
         except Exception as e:
             self.logger.error(e)
-            self.set_status( f"执行错误：{e}")
+            self.set_status(f"执行错误：{e}")
 
 
 if __name__ == "__main__":
