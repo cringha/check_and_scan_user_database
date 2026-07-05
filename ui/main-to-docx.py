@@ -38,6 +38,7 @@ class ScreenshotToDocxApp(tk.Tk, ConfigMixin):
         self.cfg = self.load_config()
         self.create_variables()
         self.create_widgets()
+        self.logger = get_log()
 
     def create_variables(self):
         self.var_input_xlsx = tk.StringVar(value=self.cfg.get("input_xlsx", ""))
@@ -292,6 +293,7 @@ class ScreenshotToDocxApp(tk.Tk, ConfigMixin):
         except Exception as e:
             err = f"执行失败：{str(e)}"
             self.set_status_error(err)
+            self.logger.exception(e);
             # messagebox.showerror("执行失败", str(e))
 
     def save_current_config(self):

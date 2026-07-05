@@ -115,13 +115,13 @@ def user_project_exp(user, project):
     username = get_dict_val(user, "Name")
     projectname = get_dict_val(project, "Name", "<PROJECT_NAME>")
 
-    logger.debuf(f"user name {username} , project {projectname}")
+    logger.debug (f"user name {username} , project {projectname}")
 
     begin = get_dict_val(project, 'Begin', 1)
     end = get_dict_val(project, 'End', 2)
 
     # print("begin  ", begin, " ", type(begin), " end  ", end, " ", type(end))
-    logger.debuf(f"user name begin {begin}  : {type(begin)},  end  {end} : {type(end)}")
+    logger.debug(f"user name begin {begin}  : {type(begin)},  end  {end} : {type(end)}")
 
     return int((end - begin + 1) * 12)
 
