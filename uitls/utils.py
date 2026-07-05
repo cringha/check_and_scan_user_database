@@ -97,9 +97,10 @@ def file_size(file_path):
     if os.path.isfile(file_path):
         file_info = os.stat(file_path)
         return convert_bytes(file_info.st_size)
+    return 0
 
 
-def get_dict_val(obj, name):
+def get_dict_val_(obj, name):
     try:
         if name in obj:
             return obj[name]
@@ -107,11 +108,17 @@ def get_dict_val(obj, name):
     except Exception as e:
         raise e
 
+def get_dict_val(obj, name, default_value=None):
+
+    if name in obj:
+        return obj[name]
+    return default_value
+
 def get_extension(filename):
     return Path(filename).suffix
 
 
-def get_extension(file_path):
+def get_extension2(file_path):
     # return Path(filename).
     return os.path.splitext(file_path)
 

@@ -5,6 +5,7 @@ import os
 import json
 
 from entries.user_cert_snapshots_to_docx import generate_snapshot_docx
+from uitls.log import init_with_conf, get_log, LogConfig
 
 CONFIG_FILE = "gui_config.json"
 
@@ -318,5 +319,8 @@ class ScreenshotToDocxApp(tk.Tk, ConfigMixin):
 
 
 if __name__ == "__main__":
+    init_with_conf(LogConfig())
+    logger = get_log()
+    logger.debug("Convert user info to docx")
     app = ScreenshotToDocxApp()
     app.mainloop()

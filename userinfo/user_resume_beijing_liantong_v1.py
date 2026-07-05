@@ -3,6 +3,7 @@ import random
 import sys
 
 from tools.excel_utils import read_excel_sheet_values
+from uitls.log import get_log
 from uitls.utils import get_dict_val
 
 from userinfo.dutyinfo import convert_duty_2_dict, find_user_duty_info
@@ -35,6 +36,8 @@ class YearProjects:
 
 def build_projects(projects):
     project_cache = {}
+
+    logger = get_log()
     for pro in projects:
         if pro is None:
             continue
@@ -47,7 +50,7 @@ def build_projects(projects):
         scope = get_dict_val(pro, "Scope")
 
         if year is None or name is None or summary is None or end is None or begin is None or scope is None:
-            print("user.xlsx 文件中， Project sheet 格式不对，应该有 Year, Name, Summary, Begin, End, Scope 字段")
+            logger.error ("user.xlsx 文件中， Project sheet 格式不对，应该有 Year, Name, Summary, Begin, End, Scope 字段")
             sys.exit(-1)
 
         p = Project(year, name, summary, begin, end, scope)
@@ -83,9 +86,10 @@ def pick_rand_project(project_cache, pick_year):
     out_list = []
     for y in yy:
         if y not in project_cache:
-            print("Year {y} not in project ")
-            exit(-1)
-            return
+            # print("Year {y} not in project ")
+            log = get_log()
+            log.warning(f"Year {y} not in project ")
+            y = random.choice(list(project_cache.keys()))
         prj = project_cache[y].get_random_project()
         out = {
             "Year": y,
@@ -101,18 +105,23 @@ def pick_rand_project(project_cache, pick_year):
 
 def user_project_exp(user, project):
 
+
+
     if user is None or project is None:
         return 6
+
+    logger = get_log()
 
     username = get_dict_val(user, "Name")
     projectname = get_dict_val(project, "Name", "<PROJECT_NAME>")
 
-    print("user name ", username, " project ", projectname)
+    logger.debuf(f"user name {username} , project {projectname}")
 
     begin = get_dict_val(project, 'Begin', 1)
     end = get_dict_val(project, 'End', 2)
 
-    print("begin  ", begin, " ", type(begin), " end  ", end, " ", type(end))
+    # print("begin  ", begin, " ", type(begin), " end  ", end, " ", type(end))
+    logger.debuf(f"user name begin {begin}  : {type(begin)},  end  {end} : {type(end)}")
 
     return int((end - begin + 1) * 12)
 
@@ -130,6 +139,7 @@ class BeijingLianTongUserResumeReader(UserResumeReader):
         self.col_duty_desc = args.col_duty_desc # 职责内容
         self.project_cache = None
         self.duties_info = None
+        self.logger = get_log()
 
     def hook_jinja(self, jinja_env: Environment):
         jinja_env.globals['user_project_exp'] = user_project_exp
@@ -140,15 +150,14 @@ class BeijingLianTongUserResumeReader(UserResumeReader):
             project = read_excel_sheet_values(file_name=input_xlsx, sheet_name=self.sheet_name_project)
             self.project_cache = build_projects(project)
         else:
-            print(f"Sheet `project` not set ")
+            self.logger.error(f"Sheet `project` not set ")
             return False
 
         if self.sheet_name_duty is not None and self.sheet_name_duty != "":
             duties = read_excel_sheet_values(file_name=input_xlsx, sheet_name=self.sheet_name_duty)
             self.duties_info = convert_duty_2_dict(duties)
         else:
-
-            print(f"Sheet `Duty` not set ")
+            self.logger.error(f"Sheet `Duty` not set ")
             return False
         return True
 

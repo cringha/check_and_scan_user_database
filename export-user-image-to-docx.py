@@ -11,6 +11,7 @@ from docxtpl import DocxTemplate, InlineImage
 
 from entries.user_cert_snapshots_to_docx import generate_snapshot_docx
 from tools.excel_utils import read_excel_sheet_values
+from uitls.log import init_with_conf, get_log, LogConfig
 from userinfo.common import SNAPSHOT_PARAMS, SNAPSHOT_NAME_CERTS, SNAPSHOT_NAME_SS, ALL_SNAPSHOT_TYPE
 from userinfo.resume_manager import make_resume_factory
 from userinfo.user_snapshots import read_user_snapshots, UserSnapshot, read_user_ss_snapshots
@@ -19,7 +20,9 @@ image_size = 120
 
 
 if __name__ == "__main__":
-
+    init_with_conf(LogConfig())
+    logger = get_log()
+    logger.debug("Convert user info to docx")
     #
     parser = argparse.ArgumentParser(description="将用户身份证、证书、合同截图转换为DOCX文档")
     parser.add_argument("-i", "--input-xlsx", help="输入Xlsx文件")

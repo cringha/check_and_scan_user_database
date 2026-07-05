@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import List, Dict
 
+from uitls.log import get_log
 from userinfo.common import SNAPSHOT_NAME_SS, SNAPSHOT_NAME_CERTS
 
 
@@ -63,7 +64,8 @@ def read_user_snapshots(snapshot_base_path: Path, user_name: str, snapshot_types
     # all_files = [f for f in target_path.iterdir() if f.is_file()]
 
     if not files:
-        print(f"未找到 {user_name} 的证书等文件, in {snapshot_base_path}, pattern: {pattern}, types: {snapshot_types}")
+        logger = get_log()
+        logger.warning (f"未找到 {user_name} 的证书等文件, in {snapshot_base_path}, pattern: {pattern}, types: {snapshot_types}")
         return []
 
     all_snapshot = []
@@ -107,7 +109,8 @@ def find_user_path_in_ss_root(ss_snapshot_base_path: Path, user_name: str, patte
     # 获取所有匹配的文件（排除子目录）
     files = [f for f in user_ss_snapshot_base_path.glob(pattern)]
     if not files:
-        print(f"未找到 {user_name} 的社保文件, in {ss_snapshot_base_path}, pattern: {pattern}")
+        logger = get_log()
+        logger.error (f"未找到 {user_name} 的社保文件, in {ss_snapshot_base_path}, pattern: {pattern}")
 
         return None
     return files
@@ -125,7 +128,8 @@ def read_user_ss_snapshots(ss_snapshot_base_path: Path, user_name: str, pattern=
         files = find_user_path_in_ss_root(ss_snapshot_base_path, user_name1, pattern)
         # user_ss_snapshot_base_path = ss_snapshot_base_path / user_name
         if files :
-            print(f"找到了 {user_name1} 的社保文件, in {ss_snapshot_base_path}, pattern: {pattern}")
+            logger = get_log()
+            logger.info(f"找到了 {user_name1} 的社保文件, in {ss_snapshot_base_path}, pattern: {pattern}")
 
     if not files:
         return None

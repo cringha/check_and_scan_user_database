@@ -2,24 +2,7 @@ import argparse
 
 from entries.user_info_to_snapshots import SUPPORT_FLAGS, step_all_user_list, get_user_list_from_xlsx, \
     do_export_user_info_to_snapshots
-from uitls.log import init_with_conf, get_log,LogConfig
-
-# def do_export_user_info_to_snapshots(excel_file_name,
-#                                      user_database_path1, output_image_dir1, flags: Set[str], user_sheet_name="Users",
-#                                      col_user_name="Name",
-#                                      ):
-#     user_list = get_user_list_from_xlsx(excel_file_name,
-#                                         user_sheet_name,
-#                                         col_user_name
-#                                         )
-#
-#     user_list = step_all_user_list(user_database_path1,
-#                                    output_image_dir1,
-#                                    user_list,
-#                                    flags
-#                                    )
-#
-#     return user_list
+from uitls.log import init_with_conf, get_log, LogConfig
 
 
 def main(args):
@@ -48,26 +31,17 @@ def main(args):
     logger.debug("user info to snapshot start")
 
     user_list = do_export_user_info_to_snapshots(args.input_xlsx, args.user_database, args.output_user_images, flags,
-                                                 None ,
+                                                 None,
                                                  args.sheet_name_user,
                                                  args.col_user_name)
-
-    # user_list = get_user_list_from_xlsx(args.input_xlsx,
-    #                                     args.sheet_name_user,
-    #                                     args.col_user_name
-    #                                     )
-    #
-    # user_list = step_all_user_list(args.user_database,
-    #                                args.output_user_images,
-    #                                user_list,
-    #                                flags
-    #                                )
 
     return True
 
 
 if __name__ == "__main__":
-
+    init_with_conf(LogConfig())
+    logger = get_log()
+    logger.debug("user info to snapshot start")
     #
     parser = argparse.ArgumentParser(description="转换用户身份证、证书、合同等转用户截图工具")
     parser.add_argument("-i", "--input-xlsx", help="输入Xlsx文件")

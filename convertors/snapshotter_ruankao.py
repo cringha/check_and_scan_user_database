@@ -5,6 +5,7 @@ from convertors.common_inf import SnapShoter, IMAGE_TYPE
 from tools.pdf_utils import snap_pdf_page
 import shutil
 
+from uitls.log import get_log
 from userinfo.common import SNAPSHOT_NAME_CERTS, SNAPSHOT_NAME_RUANKAO
 
 KEY_RUANKAO = "ruankao"
@@ -29,6 +30,8 @@ class RuanKaoCertSnapShotter(SnapShoter):
         return ""
 
     def take(self, user_name: str, src_file_name: str | List[str]):
+
+        logger = get_log()
 
         file_list = []
         if type(src_file_name) == str:
@@ -57,7 +60,9 @@ class RuanKaoCertSnapShotter(SnapShoter):
 
                 try:
                     shutil.copy2(file_full_name_path, image_full_name)
-                    print(f"已复制：{user_name} ,  {image_full_name}")
+                    # print(f"已复制：{user_name} ,  {image_full_name}")
+                    logger.info(f"已复制：{user_name} ,  {image_full_name}")
                 except Exception as e:
-                    print(f"复制失败 {user_name}  {image_full_name}: {e}")
+                    # print(f"复制失败 {user_name}  {image_full_name}: {e}")
+                    logger.info(f"复制失败 {user_name}  {image_full_name}: {e}")
                     continue
