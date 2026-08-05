@@ -4,9 +4,10 @@ from pathlib import Path
 
 # ===================== 可配置扩展区域 =====================
 # 根目录，修改为你本地实际路径
-ROOT_PATH = r"D:\人员资质、身份证"
-ROOT_PATH = r"C:\Users\101202304023\Desktop\工作\投标项目\用户身份证、毕业证、合同等信息"
-ROOT_PATH = r"D:\用户身份证、毕业证、合同等信息"
+# ROOT_PATH = r"D:\人员资质、身份证"
+# ROOT_PATH = r"C:\Users\101202304023\Desktop\工作\投标项目\用户身份证、毕业证、合同等信息"
+# ROOT_PATH = r"D:\用户身份证、毕业证、合同等信息"
+ROOT_PATH = r"E:\Tools\用户身份信息库"
 # 需要跳过的文件夹，不生成info.json
 SKIP_DIRS = {"新增资料", "所有照片"}
 # 文件匹配规则：key=json输出字段，value=匹配关键词列表（大小写忽略）

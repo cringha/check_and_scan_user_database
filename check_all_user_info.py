@@ -5,9 +5,9 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
 
 # ====================== 配置区（修改这里）======================
-ROOT_DIR = r"D:\人员资质、身份证"  # 你的根目录
-ROOT_DIR = r"C:\Users\101202304023\Desktop\工作\投标项目\用户身份证、毕业证、合同等信息"
-ROOT_DIR = r"D:\用户身份证、毕业证、合同等信息"
+# ROOT_DIR = r"D:\人员资质、身份证"  # 你的根目录
+# ROOT_DIR = r"C:\Users\101202304023\Desktop\工作\投标项目\用户身份证、毕业证、合同等信息"
+ROOT_DIR = r"E:\Tools\用户身份信息库"
 SKIP_FOLDERS = {"新增资料", "所有照片"}  # 跳过的文件夹
 EXCEL_SAVE_PATH = r"./人员资质汇总校验表.xlsx"  # 生成excel保存路径
 # 表格输出字段顺序（表头名: json键名）
