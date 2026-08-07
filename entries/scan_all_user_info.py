@@ -2,12 +2,6 @@ import os
 import json
 from pathlib import Path
 
-# ===================== 可配置扩展区域 =====================
-# 根目录，修改为你本地实际路径
-# ROOT_PATH = r"D:\人员资质、身份证"
-# ROOT_PATH = r"C:\Users\101202304023\Desktop\工作\投标项目\用户身份证、毕业证、合同等信息"
-# ROOT_PATH = r"D:\用户身份证、毕业证、合同等信息"
-ROOT_PATH = r"E:\Tools\用户身份信息库"
 # 需要跳过的文件夹，不生成info.json
 SKIP_DIRS = {"新增资料", "所有照片"}
 # 文件匹配规则：key=json输出字段，value=匹配关键词列表（大小写忽略）
@@ -20,8 +14,8 @@ MATCH_RULES = {
         "学历验证",
         "电子注册备案表"
     ],
-    "graduationCertificate": ["毕业证", "毕业证书","学历"],
-    "degreeCertificate": ["学位证", "学位证书","学位"],
+    "graduationCertificate": ["毕业证", "毕业证书", "学历"],
+    "degreeCertificate": ["学位证", "学位证书", "学位"],
     "contract": [
         "劳动合同",
         "脱敏",
@@ -32,7 +26,7 @@ MATCH_RULES = {
     "cisp": ["cisp", "CISP"],
     "cisaw": ["cisaw", "CISAW"],
     "cissp": ["cissp", "CISSP"],
-    "pmp": ["pmp","PMP"],
+    "pmp": ["pmp", "PMP"],
     "ruankao": [
         "系统集成",
         "信息系统",
@@ -103,23 +97,15 @@ def build_person_info(person_dir: Path) -> dict:
         info["other"] = unclassified
     return info
 
+
 import sys
 
-def main():
 
-    root_path = ROOT_PATH
-
-    # 访问特定的命令行参数
-    if len(sys.argv) > 1:
-        root_path = sys.argv[1]
-    else:
-        print("Usage: python scan_all_user_info.py root_path")
-        return
-
+def scan_all_user_paths(root_path: str, cb_info):
     root = Path(root_path)
     if not root.exists():
-        print(f"错误：根目录不存在，请检查路径 -> {root_path}")
-        return
+        cb_info(False, f"错误：根目录不存在，请检查路径 -> {root_path}")
+        return False
 
     # 遍历根目录下一级文件夹
     for folder in root.iterdir():
@@ -127,23 +113,16 @@ def main():
             continue
         folder_name = folder.name
         if folder_name in SKIP_DIRS:
-            print(f"跳过文件夹：{folder_name}")
+            cb_info(False, f"跳过文件夹：{folder_name}")
             continue
 
-        print(f"正在处理：{folder_name}")
+        cb_info(False, f"正在处理：{folder_name}")
         info_data = build_person_info(folder)
         json_path = folder / "info.json"
 
         # 写入格式化json，中文正常显示
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(info_data, f, ensure_ascii=False, indent=4)
-        print(f"已生成文件：{json_path.resolve()}\n")
+        cb_info(False, f"已生成文件：{json_path.resolve()}")
 
-    print("===== 全部人员目录处理完成 ====")
-
-
-if __name__ == "__main__":
-
-
-
-    main()
+    cb_info(True, "===== 全部人员目录处理完成 ====")

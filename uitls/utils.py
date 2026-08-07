@@ -1,15 +1,11 @@
+import json
 import random
 import re
-import shutil
 import string
+import tarfile
 import tempfile
 import time
-import os
-import tarfile
-
-import json
 from datetime import datetime
-import os
 from pathlib import Path
 
 
@@ -97,22 +93,16 @@ def file_size(file_path):
     if os.path.isfile(file_path):
         file_info = os.stat(file_path)
         return convert_bytes(file_info.st_size)
-    return 0
 
 
-def get_dict_val_(obj, name):
+def get_dict_val(obj, name, default_val=None):
     try:
         if name in obj:
             return obj[name]
-        return None
+        return default_val
     except Exception as e:
         raise e
 
-def get_dict_val(obj, name, default_value=None):
-
-    if name in obj:
-        return obj[name]
-    return default_value
 
 def get_extension(filename):
     return Path(filename).suffix
@@ -164,6 +154,7 @@ def remove_file(filename, mute=True, throws=False):
             if not mute:
                 print("remove file err ", filename, str(e));
 
+
 def is_empty(v):
     if v is None or v == "":
         return True
@@ -174,7 +165,6 @@ def is_not_empty(v):
     if v is not None and v != "":
         return True
     return False
-
 
 
 def beans_to_arrays(beans, names):
@@ -466,14 +456,42 @@ def clear_directory(directory):
             print(f'Failed to delete {file_path}. Reason: {e}')
 
 
+def next_file_name(output_file: str):
+    dest_file = Path(output_file)
+    file_name = dest_file.stem
+    counter = 1
+    new_file_name = f"{file_name}{dest_file.suffix}"
+    while dest_file.exists():
+        new_file_name = f"{file_name}_{counter}{dest_file.suffix}"
+        dest_file = dest_file.parent / new_file_name
+        counter += 1
+    return str(dest_file)
+
+
 def save_to_json(output_file: str, obj):
     dest_file = Path(output_file)
     file_name = dest_file.stem
     counter = 1
+    new_file_name = f"{file_name}{dest_file.suffix}"
     while dest_file.exists():
-        dest_file = dest_file.parent / f"{file_name}_{counter}{dest_file.suffix}"
+        new_file_name = f"{file_name}_{counter}{dest_file.suffix}"
+        dest_file = dest_file.parent / new_file_name
         counter += 1
 
     output_file1 = str(dest_file)
     with open(output_file1, "w", encoding="utf-8") as f:
         json.dump(obj, f, ensure_ascii=False, indent=2)
+    return dest_file
+
+
+def get_file_relative_path(file_full_path: str, current_dir: Path) -> str | None:
+
+
+    file_path = Path(file_full_path).resolve()
+    base_dir = current_dir.resolve()
+
+    try:
+        a = file_path.relative_to(base_dir)
+        return a.as_posix()
+    except ValueError:
+        return None

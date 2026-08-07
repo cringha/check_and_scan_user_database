@@ -97,7 +97,7 @@ def main():
         root_path = sys.argv[1]
         output_excel = sys.argv[2]
     else:
-        print("Usage: python scan_all_user_info.py root_path excel_output")
+        print("Usage: python cmd_scan_all_user.py root_path excel_output")
         return
 
     root = Path(root_path)
