@@ -107,6 +107,8 @@ def scan_all_user_paths(root_path: str, cb_info):
         cb_info(False, f"错误：根目录不存在，请检查路径 -> {root_path}")
         return False
 
+    output = []
+
     # 遍历根目录下一级文件夹
     for folder in root.iterdir():
         if not folder.is_dir():
@@ -123,6 +125,9 @@ def scan_all_user_paths(root_path: str, cb_info):
         # 写入格式化json，中文正常显示
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(info_data, f, ensure_ascii=False, indent=4)
-        cb_info(False, f"已生成文件：{json_path.resolve()}")
+        file_info = json_path.resolve()
+        cb_info(False, f"已生成文件：{file_info}")
+        output.append(file_info)
 
     cb_info(True, "===== 全部人员目录处理完成 ====")
+    return output

@@ -6,16 +6,18 @@ import sys
 from datetime import datetime
 from argparse import Namespace
 
+from entries.check_and_export_user_infos import check_and_export_user_infos
+from entries.scan_all_user_info import scan_all_user_paths
+
 
 class DBScannerGUI:
-    def __init__(self, master, scan_function=None):
+    def __init__(self, master ):
         self.master = master
         self.master.title("数据库目录扫描工具")
         self.master.geometry("720x580")
         self.master.resizable(True, True)
 
         # 外部传入扫描函数
-        self.scan_func = scan_function
         self.args = Namespace(root_dir="", scan_result=None)
         self.is_running = False
 
@@ -129,11 +131,7 @@ class DBScannerGUI:
         self.set_status("正在扫描...")
         self.log("开始扫描根目录...")
         try:
-            if self.scan_func is None:
-                self.log("警告：外部扫描函数未传入！")
-                self.args.scan_result = []
-            else:
-                self.args.scan_result = self.scan_func(self.args.root_dir)
+            self.args.scan_result = self.scan_core(self.args.root_dir)
             self.log(f"扫描完成，获取 {len(self.args.scan_result)} 条记录")
             self.set_status("扫描完成")
         except Exception as e:
@@ -143,6 +141,13 @@ class DBScannerGUI:
         finally:
             self.is_running = False
             self.set_buttons_state(True)
+
+    def scan_core(self, path:str ):
+        def cb_info(status, msg):
+            self.log(msg)
+
+        return scan_all_user_paths(path, cb_info)
+
 
     def on_export_excel(self):
         if self.is_running:
@@ -167,12 +172,14 @@ class DBScannerGUI:
         self.set_status("正在生成Excel...")
         self.log(f"开始导出Excel：{save_path}")
         try:
-            import pandas as pd
-            df = pd.DataFrame(self.args.scan_result)
-            df.to_excel(save_path, index=False, engine="openpyxl")
-            self.log(f"Excel导出成功 -> {save_path}")
+            def cb_info(status, msg):
+                self.log(msg)
+
+            _, new_file_name = check_and_export_user_infos(self.args.root_dir , save_path , cb_info)
+
+            self.log(f"Excel导出成功 -> {new_file_name}")
             self.set_status("导出成功")
-            messagebox.showinfo("完成", f"文件已保存：{save_path}")
+            messagebox.showinfo("完成", f"文件已保存：{new_file_name}")
         except ImportError:
             self.log("错误：缺少依赖，请执行 pip install pandas openpyxl")
             messagebox.showerror("依赖缺失", "需要安装 pandas openpyxl")
@@ -184,16 +191,10 @@ class DBScannerGUI:
             self.set_buttons_state(True)
 
 
-# ========== 示例：你的外部扫描函数（放到其他py文件里） ==========
-# from other_module import your_scan_func
-def demo_scan(root_dir):
-    """模拟外部扫描函数，实际使用时替换为你其他文件的函数"""
-    return [{"path": root_dir, "info": "demo数据"}]
-
 
 def main():
     root = tk.Tk()
-    app = DBScannerGUI(root, scan_function=demo_scan)
+    app = DBScannerGUI(root )
     root.mainloop()
 
 
