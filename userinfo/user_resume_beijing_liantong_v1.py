@@ -12,13 +12,14 @@ from jinja2 import Environment
 
 
 class Project:
-    def __init__(self, year: str, name: str, summary: str, begin, end, scope: str = ""):
+    def __init__(self, year: str, name: str, summary: str, begin, end, scope: str = "", customer :str = "") -> None:
         self.year = year
         self.name = name
         self.summary = summary
         self.scope = scope
         self.begin = begin
         self.end = end
+        self.customer  = customer
 
 
 class YearProjects:
@@ -48,12 +49,13 @@ def build_projects(projects):
         end = get_dict_val(pro, "End")
         begin = get_dict_val(pro, "Begin")
         scope = get_dict_val(pro, "Scope")
+        customer = get_dict_val(pro, "Customer")
 
         if year is None or name is None or summary is None or end is None or begin is None or scope is None:
             logger.error ("user.xlsx 文件中， Project sheet 格式不对，应该有 Year, Name, Summary, Begin, End, Scope 字段")
             sys.exit(-1)
 
-        p = Project(year, name, summary, begin, end, scope)
+        p = Project(year, name, summary, begin, end, scope,customer)
         if year not in project_cache:
             obj = YearProjects(year)
             project_cache[year] = obj
@@ -97,7 +99,8 @@ def pick_rand_project(project_cache, pick_year):
             "Summary": prj.summary,
             "Begin": prj.begin,
             "End": prj.end,
-            "Scope": prj.scope
+            "Scope": prj.scope,
+            "Customer": prj.customer
         }
         out_list.append(out)
     return out_list

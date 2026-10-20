@@ -2,6 +2,7 @@
 chcp 65001
 
 
+pyinstaller --onefile cmd_reorg_userinfo.py
 pyinstaller --onefile export-user-image-to-docx.py
 pyinstaller --onefile export-user-info-to-images.py
 pyinstaller --onefile -F -w ui/main-to-snapshots.py

@@ -22,10 +22,18 @@ class ContractSnapShotter(SnapShoter):
         id_card_file_full_name = self.database_user_path / src_file_name
 
         def gen_id_card_file_name(user_name1: str, page_num, page_count, pdf_filename):
-            if page_num in [0,2,8]:
-                image_name = f"{user_name1}-合同-{page_num}{IMAGE_TYPE}"
-                image_full_name = self.target_user_image_path / image_name
-                return str(image_full_name)
+
+            if page_count == 11:
+                if page_num in [0,2,8]:
+                    image_name = f"{user_name1}-合同-{page_num}{IMAGE_TYPE}"
+                    image_full_name = self.target_user_image_path / image_name
+                    return str(image_full_name)
+
+            if page_count == 12:
+                if page_num in [0,2,9]:
+                    image_name = f"{user_name1}-合同-{page_num}{IMAGE_TYPE}"
+                    image_full_name = self.target_user_image_path / image_name
+                    return str(image_full_name)
             return None
 
         snap_pdf_page(str(id_card_file_full_name), user_name, gen_id_card_file_name)

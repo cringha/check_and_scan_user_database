@@ -27,7 +27,7 @@ def make_dir_and_copy_file_to(target_dir: Path, user_name: str, src_path: Path, 
     print(f"【成功】源：{source_file_path}  →  目标：{target_file_path}")
 
 
-def re_org_user_certs(source_dir: str, target_dir: str, center_user_cert_root):
+def re_org_user_certs(source_dir: str, target_dir: str ):
     # 统计计数器
     move_success = 0
     error_count = 0
@@ -40,19 +40,19 @@ def re_org_user_certs(source_dir: str, target_dir: str, center_user_cert_root):
     if not target_path.exists():
         target_path.mkdir(exist_ok=True)
 
-    TARGET_ROOT_PATH = Path(center_user_cert_root)
+    # TARGET_ROOT_PATH = Path(center_user_cert_root)
 
     # 校验源文件夹是否存在
     if not source_path.exists():
         print(f"错误：源身份证目录不存在 -> {source_path}")
         return
     # 校验目标根目录是否存在
-    if not TARGET_ROOT_PATH.exists():
-        print(f"错误：目标人员根目录不存在 -> {center_user_cert_root}")
-        return
+    # if not TARGET_ROOT_PATH.exists():
+    #     print(f"错误：目标人员根目录不存在 -> {center_user_cert_root}")
+    #     return
 
     # 在 目标目录找到，所有的 人员子目录列表
-    all_user_names = get_all_users(center_user_cert_root)
+    all_user_names = get_all_users(source_dir)
 
     # 遍历源目录所有文件
     for file in source_path.iterdir():
@@ -83,11 +83,11 @@ def re_org_user_certs(source_dir: str, target_dir: str, center_user_cert_root):
 
 
 def main():
-    source_dir = r"C:\Users\101202304023\Desktop\工作\投标项目\个人证书+合同"
-    target_dir = f"{source_dir}\\目标目录"
+    source_dir = r"E:\申请资料"
+    target_dir = r"E:\人员信息"
     CENTER_TARGET_ROOT = r"C:\Users\101202304023\Desktop\工作\投标项目\用户身份证、毕业证、合同等信息"
     #
-    re_org_user_certs(source_dir, target_dir, CENTER_TARGET_ROOT)
+    re_org_user_certs(source_dir, target_dir)
     pass
 
 
